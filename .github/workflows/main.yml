@@ -15,7 +15,7 @@ jobs:
       - name: Run script
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        run: python main.py
+        run: python ./main.py
       - name: Push history
         run: |
           git config --global user.name "github-actions"

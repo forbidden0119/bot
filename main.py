@@ -3,14 +3,18 @@ import requests
 
 def main():
     webhook_url = os.environ.get('DISCORD_WEBHOOK_URL')
-    print(f"DEBUG: Webhook URLはこれです -> {webhook_url}")
+    print("DEBUG: 開始しました")
     
-    if webhook_url:
-        payload = {"content": "テスト通知です！システムは正常です。"}
-        response = requests.post(webhook_url, json=payload)
-        print(f"DEBUG: 送信結果は {response.status_code} です")
-    else:
-        print("DEBUG: Webhook URLが見つかりません！")
+    # URLが設定されているか確認
+    if not webhook_url:
+        print("DEBUG: Webhook URLが空です！")
+        return
+
+    # テスト通知送信
+    payload = {"content": "通信テスト成功！"}
+    response = requests.post(webhook_url, json=payload)
+    
+    print(f"DEBUG: 送信結果は {response.status_code} です")
 
 if __name__ == "__main__":
     main()

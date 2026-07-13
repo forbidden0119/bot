@@ -44,4 +44,6 @@ def main():
                 f.write(item + '\n')
 
 if __name__ == "__main__":
+    # ここに移動させてください
+    send_discord("テスト通知：監視ボットは正常に稼働しています！")
     main()

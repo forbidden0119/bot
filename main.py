@@ -21,25 +21,29 @@ def main():
     history_file = 'history.txt'
     old_items = set()
     
-    # 過去のデータを読み込む
     if os.path.exists(history_file):
         with open(history_file, 'r', encoding='utf-8') as f:
             old_items = {line.strip() for line in f if line.strip()}
 
     current_items = set()
     
-    # サイトから情報を取得
     for url in TARGET_URLS:
         try:
             res = requests.get(url, headers=HEADERS)
             res.encoding = res.apparent_encoding
             soup = BeautifulSoup(res.text, 'html.parser')
             
-            # イオンスタイルの現在のリスト用クラス名に合わせて調整
-            products = soup.select('.product_item')
+            # イオンのサイトのカード全体を囲むクラス名候補を網羅
+            # 商品カードが取れない場合はここが原因の可能性が高いです
+            products = soup.select('.c-product, .product_item, .js-product-item')
+            
+            print(f"DEBUG: {url} から {len(products)} 個の商品を見つけました")
+            
             for p in products:
-                name = p.select_one('.product__item--name')
-                price = p.select_one('.product__item--price')
+                # 商品名と価格のクラス名を複数候補で探す
+                name = p.select_one('.c-product__name, .product__item--name')
+                price = p.select_one('.c-product__price, .product__item--price')
+                
                 if name and price:
                     item_text = f"{name.text.strip()} ({price.text.strip()})"
                     current_items.add(item_text)
@@ -47,13 +51,11 @@ def main():
         except Exception as e:
             print(f"エラー発生: {e}")
 
-    # 新しい商品を見つけて通知
     new_items = current_items - old_items
     if new_items:
         for item in new_items:
             send_discord(f"新商品発見: {item}")
         
-        # 履歴を更新（新しい状態を保存）
         with open(history_file, 'w', encoding='utf-8') as f:
             f.write('\n'.join(current_items))
     else:
